@@ -1,0 +1,50 @@
+// lib/controllers/login_controller.dart
+
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+class LoginController extends GetxController {
+  var isLoading = false.obs;
+  var errorMessage = ''.obs;
+
+  final storage = const FlutterSecureStorage();
+
+  Future<void> login(String username, String password) async {
+    isLoading.value = true;
+    errorMessage.value = '';
+
+    final url = Uri.parse(
+        'http://127.0.0.1:8000/api/token/'); // Update with your backend URL
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'username': username,
+          'password': password,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        await storage.write(key: 'access_token', value: data['access']);
+        await storage.write(key: 'refresh_token', value: data['refresh']);
+
+        // Navigate to Dashboard
+        Get.offNamed('/dashboard');
+      } else {
+        final data = json.decode(response.body);
+        errorMessage.value = data['detail'] ?? 'Login failed';
+      }
+    } catch (e) {
+      errorMessage.value = 'An error occurred. Please try again.';
+    } finally {
+      isLoading.value = false;
+    }
+  }
+}
