@@ -53,6 +53,7 @@
 
 import 'package:get/get.dart';
 import 'package:dtc_content_manager/services/auth_service.dart';
+import 'package:dtc_content_manager/views/dashboard_page.dart';
 
 class LoginController extends GetxController {
   var username = ''.obs;
@@ -64,11 +65,15 @@ class LoginController extends GetxController {
     isLoading.value = true;
 
     try {
+      // Call the login method from AuthService
       final tokenData =
           await _authService.login(username.value, password.value);
       // Handle the token (you can store it using shared preferences or other storage)
+      // ignore: avoid_print
+
       print('Token: ${tokenData['access']}');
       Get.snackbar('Login Success', 'You are now logged in');
+      Get.off(DashboardPage());
     } catch (e) {
       Get.snackbar('Login Failed', e.toString());
     } finally {
