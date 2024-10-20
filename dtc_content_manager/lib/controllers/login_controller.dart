@@ -54,6 +54,7 @@
 import 'package:get/get.dart';
 import 'package:dtc_content_manager/services/auth_service.dart';
 import 'package:dtc_content_manager/views/dashboard_page.dart';
+import 'package:dtc_content_manager/views/login_page.dart';
 import 'package:get_storage/get_storage.dart';
 
 class LoginController extends GetxController {
@@ -70,7 +71,7 @@ class LoginController extends GetxController {
       // Call the login method from AuthService
       final tokenData =
           await _authService.login(username.value, password.value);
-      // Handle the token (you can store it using shared preferences or other storage)
+      // Handle the token
       // ignore: avoid_print
 
       //storing of the token securely in GetStorage
@@ -84,6 +85,17 @@ class LoginController extends GetxController {
       Get.snackbar('Login Failed', e.toString());
     } finally {
       isLoading.value = false;
+    }
+  }
+
+  Future<void> logout() async {
+    try {
+      // Clear the stored token
+      await storage.remove('authToken');
+      Get.snackbar('Logout Success', 'You have been logged out');
+      Get.offAll(LoginPage()); // Navigate back to the login page
+    } catch (e) {
+      Get.snackbar('Logout Failed', e.toString());
     }
   }
 }

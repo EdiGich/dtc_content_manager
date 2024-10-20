@@ -6,8 +6,12 @@ import 'messages_page.dart';
 import 'menu_update_page.dart';
 import 'gallery_upload_page.dart';
 import 'settings_page.dart';
+import '../controllers/login_controller.dart';
+import 'gallery_management_page.dart';
 
 class DashboardPage extends StatelessWidget {
+  final LoginController loginController = Get.find<LoginController>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,12 +51,36 @@ class DashboardPage extends StatelessWidget {
             ),
             SizedBox(height: 16),
 
+            //Manage Gallery Items
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AdminGalleryManagementPage()),
+                );
+              },
+              child: Text("Manage Gallery Items"),
+            ),
+
+            SizedBox(height: 16),
             // Button for Settings Page
             ElevatedButton(
               onPressed: () => Get.to(() => SettingsPage()),
               child: Text('Settings'),
               style: ElevatedButton.styleFrom(
                 padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15),
+              ),
+            ),
+
+
+            SizedBox(height: 32),
+
+            //logout button
+            ElevatedButton(
+              onPressed: () => loginController.logout(),
+              child: Text('Logout'),
+              style: ElevatedButton.styleFrom(
+                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15), backgroundColor: Colors.green,
               ),
             ),
           ],

@@ -71,6 +71,10 @@ class _GalleryUploadPageState extends State<GalleryUploadPage> {
 
       if (response.statusCode == 201) {
         Get.snackbar('Success', 'Image uploaded successfully');
+        // Clear the fields on successful upload
+        _titleController.clear();
+        _descriptionController.clear();
+        _image = null;
       } else {
         Get.snackbar('Error', 'Failed to upload image');
       }
@@ -118,6 +122,9 @@ class _GalleryUploadPageState extends State<GalleryUploadPage> {
                     onPressed: _uploadImage,
                     child: Text('Upload'),
                   ),
+
+            SizedBox(height: 32),
+
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
