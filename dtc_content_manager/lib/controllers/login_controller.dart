@@ -54,12 +54,14 @@
 import 'package:get/get.dart';
 import 'package:dtc_content_manager/services/auth_service.dart';
 import 'package:dtc_content_manager/views/dashboard_page.dart';
+import 'package:get_storage/get_storage.dart';
 
 class LoginController extends GetxController {
   var username = ''.obs;
   var password = ''.obs;
   var isLoading = false.obs;
   final AuthService _authService = AuthService();
+  final storage=GetStorage(); //the storage instance
 
   Future<void> login() async {
     isLoading.value = true;
@@ -71,7 +73,11 @@ class LoginController extends GetxController {
       // Handle the token (you can store it using shared preferences or other storage)
       // ignore: avoid_print
 
-      print('Token: ${tokenData['access']}');
+      //storing of the token securely in GetStorage
+      storage.write('authToken', tokenData['access']);
+
+      //print('Token: ${tokenData['access']}');
+
       Get.snackbar('Login Success', 'You are now logged in');
       Get.off(DashboardPage());
     } catch (e) {

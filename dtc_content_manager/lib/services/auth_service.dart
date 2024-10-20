@@ -55,21 +55,20 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class AuthService {
-  // Make sure to use your actual server address here
+
   final String baseUrl =
-      'http://localhost:8000/api/token/'; // Change localhost if testing on an emulator
+      'http://10.0.2.2:8000/api/token/';
 
   Future<Map<String, dynamic>> login(String username, String password) async {
     final response = await http.post(
-      Uri.parse(baseUrl), // Use baseUrl directly
+      Uri.parse(baseUrl),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'username': username, 'password': password}),
     );
 
     if (response.statusCode == 200) {
-      return jsonDecode(response.body); // Token response
+      return jsonDecode(response.body);
     } else {
-      // Optionally, you can parse the error response for more information
       throw Exception('Failed to login: ${response.body}');
     }
   }
