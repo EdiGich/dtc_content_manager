@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:get_storage/get_storage.dart';
+import 'package:dtc_content_manager/models/menu_item_model.dart';
 
 class MenuUpdatePage extends StatefulWidget {
   @override
@@ -9,11 +10,10 @@ class MenuUpdatePage extends StatefulWidget {
 }
 
 class _MenuUpdatePageState extends State<MenuUpdatePage> {
-  List menuItems = [];
+  List<MenuItem> menuItems = [];
   bool isLoading = true;
   bool hasError = false;
 
-  // URL for your Django API endpoint
   final String menuApiUrl = 'http://10.0.2.2:8000/api/menu/';
 
   @override
@@ -34,18 +34,26 @@ class _MenuUpdatePageState extends State<MenuUpdatePage> {
         'Content-Type': 'application/json',
       });
 
+      // print('Status Code: ${response.statusCode}');
+      // print('Response Body: ${response.body}');
+
       if (response.statusCode == 200) {
+        final List<dynamic> decodedData = json.decode(response.body);
         setState(() {
-          menuItems = json.decode(response.body);
+          menuItems = decodedData
+              .map((data) => MenuItem.fromJson(data as Map<String, dynamic>))
+              .toList();
           isLoading = false;
         });
       } else {
+        print('Failed to fetch menu items');
         setState(() {
           hasError = true;
           isLoading = false;
         });
       }
     } catch (e) {
+      print('Error: $e');
       setState(() {
         hasError = true;
         isLoading = false;
@@ -53,20 +61,21 @@ class _MenuUpdatePageState extends State<MenuUpdatePage> {
     }
   }
 
-  Future<void> updateMenuItem(int id, Map<String, dynamic> newData) async {
+
+  Future<void> updateMenuItem(MenuItem updatedItem) async {
     final response = await http.put(
-      Uri.parse('$menuApiUrl$id/'),
+      Uri.parse('$menuApiUrl${updatedItem.id}/'),
       headers: {
         'Authorization': 'Bearer ${GetStorage().read('authToken')}',
         'Content-Type': 'application/json',
       },
-      body: json.encode(newData),
+      body: json.encode(updatedItem.toJson()),
     );
 
     if (response.statusCode == 200) {
       setState(() {
-        final index = menuItems.indexWhere((item) => item['id'] == id);
-        menuItems[index] = json.decode(response.body);
+        final index = menuItems.indexWhere((item) => item.id == updatedItem.id);
+        menuItems[index] = MenuItem.fromJson(json.decode(response.body));
       });
     } else {
       print('Failed to update item');
@@ -83,7 +92,7 @@ class _MenuUpdatePageState extends State<MenuUpdatePage> {
 
     if (response.statusCode == 204) {
       setState(() {
-        menuItems.removeWhere((item) => item['id'] == id);
+        menuItems.removeWhere((item) => item.id == id);
       });
     } else {
       print('Failed to delete item');
@@ -103,24 +112,24 @@ class _MenuUpdatePageState extends State<MenuUpdatePage> {
         itemBuilder: (context, index) {
           final item = menuItems[index];
           return ListTile(
-            leading: item['image_url'] != null
-                ? Image.network(item['image_url']) // Display image if URL is available
+            leading: item.imageUrl != null
+                ? Image.network(item.imageUrl!)
                 : Icon(Icons.image_not_supported),
-            title: Text(item['name'] ?? 'No name'),
-            subtitle: Text(item['description'] ?? 'No description'),
+            title: Text(item.name),
+            subtitle: Text(item.description),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
                   icon: Icon(Icons.edit),
                   onPressed: () {
-                    _showEditDialog(item['id'], item);
+                    _showEditDialog(item);
                   },
                 ),
                 IconButton(
                   icon: Icon(Icons.delete),
                   onPressed: () {
-                    deleteMenuItem(item['id']);
+                    deleteMenuItem(item.id);
                   },
                 ),
               ],
@@ -131,10 +140,10 @@ class _MenuUpdatePageState extends State<MenuUpdatePage> {
     );
   }
 
-  void _showEditDialog(int id, Map<String, dynamic> item) {
-    final nameController = TextEditingController(text: item['name']);
-    final descriptionController = TextEditingController(text: item['description']);
-    final priceController = TextEditingController(text: item['price'].toString());
+  void _showEditDialog(MenuItem item) {
+    final nameController = TextEditingController(text: item.name);
+    final descriptionController = TextEditingController(text: item.description);
+    final priceController = TextEditingController(text: item.price.toString());
 
     showDialog(
       context: context,
@@ -166,12 +175,14 @@ class _MenuUpdatePageState extends State<MenuUpdatePage> {
             ),
             TextButton(
               onPressed: () {
-                final newData = {
-                  'name': nameController.text,
-                  'description': descriptionController.text,
-                  'price': double.tryParse(priceController.text) ?? 0,
-                };
-                updateMenuItem(id, newData);
+                final updatedItem = MenuItem(
+                  id: item.id,
+                  name: nameController.text,
+                  description: descriptionController.text,
+                  price: double.tryParse(priceController.text) ?? 0,
+                  imageUrl: item.imageUrl,
+                );
+                updateMenuItem(updatedItem);
                 Navigator.of(context).pop();
               },
               child: Text('Save'),

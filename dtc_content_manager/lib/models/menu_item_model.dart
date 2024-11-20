@@ -16,10 +16,10 @@ class MenuItem {
 
   factory MenuItem.fromJson(Map<String, dynamic> json) {
     return MenuItem(
-      id: json['id'],
-      name: json['name'],
-      description: json['description'],
-      price: json['price'].toDouble(),
+      id: json['id'] ?? 0,
+      name: json['name'] ?? 'No Name',
+      description: json['description'] ?? 'No Description',
+      price: double.tryParse(json['price']?.toString() ?? '0') ?? 0.0,
       imageUrl: json['image_url'] as String?,
     );
   }
