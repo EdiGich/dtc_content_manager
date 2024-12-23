@@ -8,6 +8,8 @@ import 'gallery_upload_page.dart';
 import 'settings_page.dart';
 import '../controllers/login_controller.dart';
 import 'gallery_management_page.dart';
+import 'news_page.dart';
+import 'events_page.dart';
 
 class DashboardPage extends StatelessWidget {
   final LoginController loginController = Get.find<LoginController>();
@@ -60,6 +62,28 @@ class DashboardPage extends StatelessWidget {
                 );
               },
               child: Text("Manage Gallery Items"),
+            ),
+
+            //Manage Events
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => EventsPage()),
+                );
+              },
+              child: Text("Listed Events"),
+            ),
+
+            //Manage News
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NewsPage()),
+                );
+              },
+              child: Text("News"),
             ),
 
             SizedBox(height: 16),
