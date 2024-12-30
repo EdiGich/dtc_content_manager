@@ -1,5 +1,7 @@
+// events_page.dart
 import 'package:flutter/material.dart';
 import 'package:dtc_content_manager/services/news_events_service.dart';
+import 'package:dtc_content_manager/add_event_page.dart';
 
 class EventsPage extends StatefulWidget {
   @override
@@ -22,28 +24,6 @@ class _EventsPageState extends State<EventsPage> {
     });
   }
 
-  Future<void> _addEvent() async {
-    final newEvent = {
-      'title': 'New Event',
-      'description': 'This is a newly created event.',
-      'date': '2024-12-25',
-      'time': '15:00',
-      'image': null,
-    };
-
-    try {
-      await _service.createEvent(newEvent);
-      _refreshEvents();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Event created successfully')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to create event')),
-      );
-    }
-  }
-
   Future<void> _deleteEvent(int eventId) async {
     try {
       await _service.deleteEvent(eventId);
@@ -58,20 +38,25 @@ class _EventsPageState extends State<EventsPage> {
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Text('Events'),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: _addEvent,
-            ),
-          ],
+        title: const Text('Events'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddEventPage(refreshEvents: _refreshEvents),
+                ),
+              );
+            },
+          ),
+        ],
       ),
-
       body: FutureBuilder<List<dynamic>>(
         future: _eventsList,
         builder: (context, snapshot) {
@@ -89,9 +74,9 @@ class _EventsPageState extends State<EventsPage> {
                 return Card(
                   margin: const EdgeInsets.all(8.0),
                   child: ListTile(
-                    title: Text(event['title']),
+                    title: Text(event['title'] ?? 'Untitled Event'),
                     subtitle: Text(
-                      '${event['date']} at ${event['time']}',
+                      '${event['date'] ?? 'N/A'} at ${event['time'] ?? 'N/A'}',
                     ),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete),
@@ -104,7 +89,7 @@ class _EventsPageState extends State<EventsPage> {
                       height: 50,
                       fit: BoxFit.cover,
                     )
-                        : null,
+                        : const Icon(Icons.event),
                   ),
                 );
               },
