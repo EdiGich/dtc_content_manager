@@ -90,7 +90,39 @@ class NewsEventsService {
     }
   }
 
+// Create a News Post
+  Future<void> createNews(Map<String, dynamic> newsData) async {
+    // Build the URL as a string
+    final String url = '${baseUrl}news/';
+    final Atoken = GetStorage().read('authToken') ?? ''; // Retrieve the auth token
 
+    try {
+      // Parse the URL into a Uri object
+      final Uri uri = Uri.parse(url);
+
+      // Prepare the multipart request
+      final request = http.MultipartRequest('POST', uri)
+        ..headers['Authorization'] = 'Bearer $Atoken' // Include the authorization header
+        ..fields['title'] = newsData['title']
+        ..fields['content'] = newsData['content']
+        ..fields['date'] = newsData['date']
+        ..fields['time'] = newsData['time'];
+
+      // Send the request
+      final response = await request.send();
+
+      // Handle the response
+      if (response.statusCode == 201) {
+        print('News Posted successfully');
+      } else {
+        final responseBody = await response.stream.bytesToString();
+        throw Exception('Failed to Post News: $responseBody');
+      }
+    } catch (e) {
+      print('Error: $e');
+      rethrow;
+    }
+  }
 
 
   // Update an existing event
@@ -116,6 +148,25 @@ class NewsEventsService {
 // Delete an event
   Future<bool> deleteEvent(int eventId) async {
     final String url = '${baseUrl}events/$eventId/';
+
+    final response = await http.delete(
+      Uri.parse(url),
+      headers: {
+        'Authorization': 'Bearer $authToken',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 204) {
+      return true; // Event deleted successfully
+    } else {
+      throw Exception('Failed to delete event');
+    }
+  }
+
+  // Delete a news post
+  Future<bool> deleteNews(int newsId) async {
+    final String url = '${baseUrl}news/$newsId/';
 
     final response = await http.delete(
       Uri.parse(url),

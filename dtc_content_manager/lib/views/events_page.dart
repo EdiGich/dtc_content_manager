@@ -1,7 +1,7 @@
 // events_page.dart
 import 'package:flutter/material.dart';
 import 'package:dtc_content_manager/services/news_events_service.dart';
-import 'package:dtc_content_manager/add_event_page.dart';
+import 'package:dtc_content_manager/views/add_event_page.dart';
 
 class EventsPage extends StatefulWidget {
   @override
