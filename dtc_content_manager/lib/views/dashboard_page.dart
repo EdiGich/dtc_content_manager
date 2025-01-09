@@ -13,7 +13,6 @@ import 'events_page.dart';
 
 class DashboardPage extends StatelessWidget {
   final LoginController loginController = Get.find<LoginController>();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -100,16 +99,46 @@ class DashboardPage extends StatelessWidget {
             SizedBox(height: 32),
 
             //logout button
-            ElevatedButton(
-              onPressed: () => loginController.logout(),
-              child: Text('Logout'),
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 50, vertical: 15), backgroundColor: Colors.green,
+            TextButton(
+              onPressed: () => _showLogoutConfirmation(context),
+              child: const Text('Logout'),
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 15),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  void _showLogoutConfirmation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Logout'),
+          content: const Text('Are you sure you want to logout?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                // Call the logout function (replace with your actual logout function)
+                loginController.logout();
+
+                // Close the dialog after logout
+                Navigator.of(context).pop();
+              },
+              child: const Text('Logout'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
