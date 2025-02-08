@@ -18,8 +18,8 @@ class _MessagesPageState extends State<MessagesPage> {
   String filter = 'All'; // Filter options: 'All', 'Read', 'Not Read'
 
   // API URL
-  final String messagesApiUrl = 'http://10.0.2.2:8000/api/messages/';
-
+  // final String messagesApiUrl = 'http://10.0.2.2:8000/api/messages/';
+  final String messagesApiUrl = 'http://codenaican.pythonanywhere.com/api/messages/';
   @override
   void initState() {
     super.initState();

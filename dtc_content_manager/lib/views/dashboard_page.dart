@@ -10,6 +10,7 @@ import '../controllers/login_controller.dart';
 import 'gallery_management_page.dart';
 import 'news_page.dart';
 import 'events_page.dart';
+import 'notifications_page.dart';
 
 class DashboardPage extends StatelessWidget {
   final LoginController loginController = Get.find<LoginController>();
@@ -61,6 +62,18 @@ class DashboardPage extends StatelessWidget {
                 );
               },
               child: Text("Manage Gallery Items"),
+            ),
+            SizedBox(height: 16),
+
+            //Notifications page but to be deleted later by me of course
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => NotificationsPage()),
+                );
+              },
+              child: Text("View Notifications"),
             ),
 
             //Manage Events

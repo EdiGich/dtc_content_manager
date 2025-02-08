@@ -22,7 +22,8 @@ class _GalleryUploadPageState extends State<GalleryUploadPage> {
   bool _isLoading = false;
 
   // backend URL
-  final String uploadUrl = 'http://10.0.2.2:8000/api/galleryitem/upload/';
+  // final String uploadUrl = 'http://10.0.2.2:8000/api/galleryitem/upload/';
+  final String uploadUrl = 'http://codenaican.pythonanywhere.com/api/galleryitem/upload/';
 
   final storage = GetStorage();
 

@@ -6,7 +6,9 @@ import 'package:get_storage/get_storage.dart';
 
 
 class NewsEventsService {
-  final String baseUrl = 'http://10.0.2.2:8000/api/';
+  // final String baseUrl = 'http://10.0.2.2:8000/api/';
+  final String baseUrl = 'http://codenaican.pythonanywhere.com/api/';
+
   final String authToken = GetStorage().read('authToken');
 
 

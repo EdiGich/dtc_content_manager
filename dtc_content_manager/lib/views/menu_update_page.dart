@@ -14,7 +14,9 @@ class _MenuUpdatePageState extends State<MenuUpdatePage> {
   bool isLoading = true;
   bool hasError = false;
 
-  final String menuApiUrl = 'http://10.0.2.2:8000/api/menu/';
+  // final String menuApiUrl = 'http://10.0.2.2:8000/api/menu/';
+  final String menuApiUrl = 'http://codenaican.pythonanywhere.com/api/menu/';
+
 
   @override
   void initState() {

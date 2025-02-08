@@ -11,7 +11,9 @@ class MessageDetailsPage extends StatelessWidget {
 
   // Function to update the status of the message
   void updateMessageStatus(BuildContext context, int messageId, int newStatus) async {
-    final String updateUrl = 'http://10.0.2.2:8000/api/messages/$messageId/';
+    // final String updateUrl = 'http://10.0.2.2:8000/api/messages/$messageId/';
+    final String updateUrl = 'http://codenaican.pythonanywhere.coms/api/messages/$messageId/';
+
     final token = GetStorage().read('authToken');
 
     try {

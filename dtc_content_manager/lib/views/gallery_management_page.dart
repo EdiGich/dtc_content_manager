@@ -48,7 +48,9 @@ class _AdminGalleryManagementPageState
 
       // Send API request
       final response = await http.get(
-        Uri.parse('http://10.0.2.2:8000/api/galleryitem/manage/'),
+        // Uri.parse('http://10.0.2.2:8000/api/galleryitem/manage/'),
+        Uri.parse('https://codenaican.pythonanywhere.com/api/galleryitem/manage/'),
+
         headers: {
           'Authorization': 'Bearer $token',  // Include JWT token in the headers
         },
@@ -93,7 +95,9 @@ class _AdminGalleryManagementPageState
     // String? token = storage.read('authToken'); // Read token from GetStorage
 
     final response = await http.delete(
-      Uri.parse('http://10.0.2.2:8000/api/galleryitem/manage/$id/'),
+      // Uri.parse('http://10.0.2.2:8000/api/galleryitem/manage/$id/'),
+      Uri.parse('https://codenaican.pythonanywhere.com/api/galleryitem/manage/$id/'),
+
       headers: {
         // 'Authorization': 'Bearer $token', // Send token in the header
         'Authorization': 'Bearer ${storage.read('authToken')}',
@@ -117,7 +121,9 @@ class _AdminGalleryManagementPageState
     String? token = storage.read('authToken'); // Read token from GetStorage
 
     final response = await http.put(
-      Uri.parse('http://10.0.2.2:8000/api/galleryitem/manage/$id/'),
+      // Uri.parse('http://10.0.2.2:8000/api/galleryitem/manage/$id/'),
+      Uri.parse('https://codenaican.pythonanywhere.com/api/galleryitem/manage/$id/'),
+
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token', // Send token in the header
@@ -156,8 +162,10 @@ class _AdminGalleryManagementPageState
 
           return ListTile(
             leading: Image.network(
-                'http://10.0.2.2:8000${item['image']}'),
-            title: Text(item['title'] ?? 'No title'),
+                // 'http://10.0.2.2:8000${item['image']}'),
+                'http://codenaican.pythonanywhere.com${item['image']}'),
+
+          title: Text(item['title'] ?? 'No title'),
             subtitle: Text(item['description'] ?? 'No description'),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,

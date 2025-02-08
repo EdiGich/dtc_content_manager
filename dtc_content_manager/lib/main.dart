@@ -6,10 +6,28 @@ import 'package:dtc_content_manager/views/login_page.dart';
 import 'package:get_storage/get_storage.dart';
 import 'views/offline_page.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'services/websocket_service.dart'; // Added for WebSocket Service
+import 'views/notifications_page.dart';
 
+// Global notification plugin
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+FlutterLocalNotificationsPlugin();
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize GetStorage
   await GetStorage.init();
+
+  // Initialize local notifications
+  const AndroidInitializationSettings androidSettings =
+  AndroidInitializationSettings('@mipmap/ic_launcher');
+  const InitializationSettings initializationSettings =
+  InitializationSettings(android: androidSettings);
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+
   runApp(MyApp());
 }
 
@@ -35,10 +53,18 @@ class _ConnectivityWrapperState extends State<ConnectivityWrapper> {
   late Future<ConnectivityResult> _initialConnectivity;
   late Stream<ConnectivityResult> _connectivityStream;
   bool _isOffline = false;
+  late WebSocketService _webSocketService; // WebSocket Service instance
 
   @override
   void initState() {
     super.initState();
+
+    // Initialize WebSocket Service
+    _webSocketService = WebSocketService(
+      serverUrl: 'wss://codenaican.pythonanywhere.com/ws/notifications/', // WebSocket URL
+    );
+    _webSocketService.connect();
+    // serverUrl: 'ws://127.0.0.1:8000/ws/notifications/',
 
     // Initialize connectivity checks
     _initialConnectivity = Connectivity().checkConnectivity();
@@ -50,6 +76,12 @@ class _ConnectivityWrapperState extends State<ConnectivityWrapper> {
         _isOffline = result == ConnectivityResult.none;
       });
     });
+  }
+
+  @override
+  void dispose() {
+    _webSocketService.disconnect(); // Disconnect WebSocket when widget is disposed
+    super.dispose();
   }
 
   @override
@@ -75,7 +107,7 @@ class _ConnectivityWrapperState extends State<ConnectivityWrapper> {
 
         return LoginPage(); // Replace with your app's main content
       },
-    );
+    ); // FutureBuilder
   }
 }
 
@@ -101,4 +133,3 @@ class ThemeService {
     Get.changeThemeMode(isDarkMode() ? ThemeMode.dark : ThemeMode.light);
   }
 }
-
