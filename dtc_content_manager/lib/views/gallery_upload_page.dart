@@ -8,7 +8,6 @@ import 'package:http/http.dart' as http;
 import 'package:get_storage/get_storage.dart';
 import 'gallery_management_page.dart';
 
-
 class GalleryUploadPage extends StatefulWidget {
   @override
   _GalleryUploadPageState createState() => _GalleryUploadPageState();
@@ -21,10 +20,7 @@ class _GalleryUploadPageState extends State<GalleryUploadPage> {
   final TextEditingController _descriptionController = TextEditingController();
   bool _isLoading = false;
 
-  // backend URL
-  // final String uploadUrl = 'http://10.0.2.2:8000/api/galleryitem/upload/';
-  final String uploadUrl = 'http://codenaican.pythonanywhere.com/api/galleryitem/upload/';
-
+  final String uploadUrl = 'https://codenaican.pythonanywhere.com/api/galleryitem/upload/';
   final storage = GetStorage();
 
   Future<void> _pickImage() async {
@@ -37,9 +33,7 @@ class _GalleryUploadPageState extends State<GalleryUploadPage> {
   }
 
   Future<void> _uploadImage() async {
-    if (_image == null ||
-        _titleController.text.isEmpty ||
-        _descriptionController.text.isEmpty) {
+    if (_image == null || _titleController.text.isEmpty || _descriptionController.text.isEmpty) {
       Get.snackbar('Error', 'Please fill all fields and pick an image.');
       return;
     }
@@ -48,42 +42,38 @@ class _GalleryUploadPageState extends State<GalleryUploadPage> {
       _isLoading = true;
     });
 
-    // Retrieve the token from storage
-    String? authToken = storage.read('authToken'); // Correctly read the token
-
+    String? authToken = storage.read('authToken');
     if (authToken == null) {
-      Get.snackbar('Error', 'Authentication token not found. Iko wapi funguo?.');
+      Get.snackbar('Error', 'Authentication token not found.');
+      setState(() {
+        _isLoading = false;
+      });
       return;
     }
 
     var request = http.MultipartRequest('POST', Uri.parse(uploadUrl));
     request.fields['title'] = _titleController.text;
     request.fields['description'] = _descriptionController.text;
-
-    // adding the image to the request
-    var pic = await http.MultipartFile.fromPath('image', _image!.path);
-    request.files.add(pic);
-
-    //adding the authorization header to the request
+    request.files.add(await http.MultipartFile.fromPath('image', _image!.path));
     request.headers['Authorization'] = 'Bearer $authToken';
 
     try {
       var response = await request.send();
-
       if (response.statusCode == 201) {
         Get.snackbar('Success', 'Image uploaded successfully');
-        // Clear the fields on successful upload
-        _titleController.clear();
-        _descriptionController.clear();
-        _image = null;
+        setState(() {
+          _titleController.clear();
+          _descriptionController.clear();
+          _image = null;
+        });
       } else {
         Get.snackbar('Error', 'Failed to upload image');
       }
-      }catch(e){
-      Get.snackbar('Error','An error occurred: $e');
+    } catch (e) {
+      Get.snackbar('Error', 'An error occurred: $e');
     } finally {
       setState(() {
-        _isLoading=false;
+        _isLoading = false;
       });
     }
   }
@@ -92,51 +82,85 @@ class _GalleryUploadPageState extends State<GalleryUploadPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Upload Gallery Items'),
+        title: const Text('Upload Gallery Item'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _titleController,
-              decoration: InputDecoration(labelText: 'Title'),
-            ),
-            SizedBox(height: 16),
-            TextField(
-              controller: _descriptionController,
-              decoration: InputDecoration(labelText: 'Description'),
-            ),
-            SizedBox(height: 16),
-            _image == null
-                ? Text('No image selected.')
-                : Image.file(_image!, height: 150, width: 150),
-            ElevatedButton(
-              onPressed: _pickImage,
-              child: Text('Pick Image'),
-            ),
-            SizedBox(height: 16),
-            _isLoading
-                ? CircularProgressIndicator()
-                : ElevatedButton(
-                    onPressed: _uploadImage,
-                    child: Text('Upload'),
+      body: Container(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        padding: const EdgeInsets.all(20.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: _titleController,
+                decoration: const InputDecoration(
+                  labelText: 'Title',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _descriptionController,
+                decoration: const InputDecoration(
+                  labelText: 'Description',
+                  border: OutlineInputBorder(),
+                ),
+                maxLines: 3,
+              ),
+              const SizedBox(height: 20),
+              Card(
+                elevation: 2,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      _image == null
+                          ? const Text(
+                        'No image selected',
+                        style: TextStyle(color: Colors.grey),
+                      )
+                          : ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.file(_image!, height: 150, width: 150, fit: BoxFit.cover),
+                      ),
+                      const SizedBox(height: 16),
+                      ElevatedButton.icon(
+                        onPressed: _pickImage,
+                        icon: const Icon(Icons.image),
+                        label: const Text('Pick Image'),
+                      ),
+                    ],
                   ),
-
-            SizedBox(height: 32),
-
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AdminGalleryManagementPage()),
-                );
-              },
-              child: Text("Manage Gallery Items"),
-            )
-          ],
-
+                ),
+              ),
+              const SizedBox(height: 20),
+              _isLoading
+                  ? const Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.teal),
+                ),
+              )
+                  : ElevatedButton(
+                onPressed: _uploadImage,
+                child: const Text('Upload'),
+              ),
+              const SizedBox(height: 32),
+              OutlinedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AdminGalleryManagementPage()),
+                  );
+                },
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(color: Theme.of(context).primaryColor),
+                  padding: const EdgeInsets.symmetric(vertical: 15),
+                ),
+                child: const Text('Manage Gallery Items'),
+              ),
+            ],
+          ),
         ),
       ),
     );

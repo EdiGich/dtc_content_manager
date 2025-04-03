@@ -9,24 +9,47 @@ class NotificationsPage extends StatefulWidget {
 class _NotificationsPageState extends State<NotificationsPage> {
   late WebSocketService _webSocketService;
   List<String> _messages = [];
+  bool _isConnected = false;
 
   @override
   void initState() {
     super.initState();
+    _initializeWebSocket();
+  }
 
-    // Initialize WebSocket connection
-    // _webSocketService = WebSocketService(serverUrl: 'ws://127.0.0.1:8000/ws/notifications/');
-    _webSocketService = WebSocketService(serverUrl: 'wss://codenaican.pythonanywhere.com/ws/notifications/');
+  void _initializeWebSocket() {
+    _webSocketService = WebSocketService(
+      serverUrl: 'wss://codenaican.pythonanywhere.com/ws/notifications/',
+    );
 
     _webSocketService.connect();
 
-    // Listen to WebSocket messages
-    _webSocketService.messages.listen((message) {
-      setState(() {
-        _messages.add(message);
-      });
-      print('Received: $message');
-    });
+    _webSocketService.messages.listen(
+          (message) {
+        setState(() {
+          _messages.add(message);
+          _isConnected = true;
+        });
+        print('Received: $message');
+      },
+      onError: (error) {
+        setState(() {
+          _isConnected = false;
+        });
+        print('Stream Error: $error');
+      },
+      onDone: () {
+        setState(() {
+          _isConnected = false;
+        });
+        print('Stream Done');
+      },
+    );
+  }
+
+  void _reconnect() {
+    _webSocketService.disconnect();
+    _initializeWebSocket();
   }
 
   @override
@@ -39,15 +62,45 @@ class _NotificationsPageState extends State<NotificationsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Notifications'),
+        title: const Text('Notifications'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _reconnect,
+            tooltip: 'Reconnect',
+          ),
+        ],
       ),
-      body: ListView.builder(
-        itemCount: _messages.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(_messages[index]),
-          );
-        },
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              _isConnected ? 'Connected' : 'Disconnected',
+              style: TextStyle(
+                color: _isConnected ? Colors.green : Colors.red,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Expanded(
+            child: _messages.isEmpty
+                ? const Center(child: Text('No notifications yet'))
+                : ListView.builder(
+              itemCount: _messages.length,
+              itemBuilder: (context, index) {
+                return Card(
+                  elevation: 2,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  child: ListTile(
+                    title: Text(_messages[index]),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

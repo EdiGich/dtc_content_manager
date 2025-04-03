@@ -7,8 +7,8 @@ import 'package:get_storage/get_storage.dart';
 import 'views/offline_page.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'services/websocket_service.dart'; // Added for WebSocket Service
-import 'views/notifications_page.dart';
+import 'services/websocket_service.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 // Global notification plugin
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
@@ -36,9 +36,87 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'DTC Content Manager',
-      theme: ThemeData.light(),
-      darkTheme: ThemeData.dark(),
-      themeMode: ThemeService().theme, // Control theme mode
+      theme: ThemeData(
+        primarySwatch: Colors.teal,
+        scaffoldBackgroundColor: Colors.teal.shade50,
+        textTheme: GoogleFonts.poppinsTextTheme(
+          ThemeData.light().textTheme, // Apply Poppins to light theme
+        ),
+        appBarTheme: const AppBarTheme(
+          elevation: 0,
+          centerTitle: true,
+          backgroundColor: Colors.teal,
+          foregroundColor: Colors.white,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ButtonStyle(
+            backgroundColor: WidgetStateProperty.all(Colors.teal),
+            foregroundColor: WidgetStateProperty.all(Colors.white),
+            padding: WidgetStateProperty.all(
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            ),
+            shape: WidgetStateProperty.resolveWith((states) {
+              final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+              return RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: isDarkMode
+                    ? const BorderSide(color: Colors.white70, width: 1)
+                    : BorderSide.none,
+              );
+            }),
+            elevation: WidgetStateProperty.all(5),
+            textStyle: WidgetStateProperty.all(
+              const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.white.withOpacity(0.9),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Colors.teal, width: 2),
+          ),
+          labelStyle: const TextStyle(color: Colors.teal),
+        ),
+      ),
+      darkTheme: ThemeData.dark().copyWith(
+        primaryColor: Colors.teal,
+        scaffoldBackgroundColor: Colors.grey.shade900,
+        textTheme: GoogleFonts.poppinsTextTheme(
+          ThemeData.dark().textTheme, // Apply Poppins to dark theme
+        ),
+        appBarTheme: const AppBarTheme(
+          elevation: 0,
+          centerTitle: true,
+          backgroundColor: Colors.teal,
+          foregroundColor: Colors.white,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ButtonStyle(
+            backgroundColor: WidgetStateProperty.all(Colors.teal),
+            foregroundColor: WidgetStateProperty.all(Colors.white),
+            padding: WidgetStateProperty.all(
+              const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+            ),
+            shape: WidgetStateProperty.all(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: const BorderSide(color: Colors.white70, width: 1), // Border in dark mode
+              ),
+            ),
+            elevation: WidgetStateProperty.all(5),
+            textStyle: WidgetStateProperty.all(
+              const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            ),
+          ),
+        ),
+      ),
+      themeMode: ThemeService().theme,
       home: ConnectivityWrapper(),
     );
   }
@@ -53,7 +131,7 @@ class _ConnectivityWrapperState extends State<ConnectivityWrapper> {
   late Future<ConnectivityResult> _initialConnectivity;
   late Stream<ConnectivityResult> _connectivityStream;
   bool _isOffline = false;
-  late WebSocketService _webSocketService; // WebSocket Service instance
+  late WebSocketService _webSocketService;
 
   @override
   void initState() {
@@ -61,10 +139,9 @@ class _ConnectivityWrapperState extends State<ConnectivityWrapper> {
 
     // Initialize WebSocket Service
     _webSocketService = WebSocketService(
-      serverUrl: 'wss://codenaican.pythonanywhere.com/ws/notifications/', // WebSocket URL
+      serverUrl: 'wss://codenaican.pythonanywhere.com/ws/notifications/',
     );
     _webSocketService.connect();
-    // serverUrl: 'ws://127.0.0.1:8000/ws/notifications/',
 
     // Initialize connectivity checks
     _initialConnectivity = Connectivity().checkConnectivity();
@@ -80,7 +157,7 @@ class _ConnectivityWrapperState extends State<ConnectivityWrapper> {
 
   @override
   void dispose() {
-    _webSocketService.disconnect(); // Disconnect WebSocket when widget is disposed
+    _webSocketService.disconnect();
     super.dispose();
   }
 
@@ -90,8 +167,31 @@ class _ConnectivityWrapperState extends State<ConnectivityWrapper> {
       future: _initialConnectivity,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
+          return Scaffold(
+            body: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.teal.shade100, Colors.teal.shade50],
+                ),
+              ),
+              child: const Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.teal),
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      'Checking Connection...',
+                      style: TextStyle(fontSize: 16, color: Colors.teal),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           );
         }
 
@@ -105,29 +205,25 @@ class _ConnectivityWrapperState extends State<ConnectivityWrapper> {
           );
         }
 
-        return LoginPage(); // Replace with your app's main content
+        return LoginPage();
       },
-    ); // FutureBuilder
+    );
   }
 }
 
 class ThemeService {
   final _key = 'isDarkMode';
 
-  // Save theme mode
   void saveTheme(bool isDarkMode) {
     GetStorage().write(_key, isDarkMode);
   }
 
-  // Load theme mode
   bool isDarkMode() {
     return GetStorage().read(_key) ?? false;
   }
 
-  // Get current theme mode
   ThemeMode get theme => isDarkMode() ? ThemeMode.dark : ThemeMode.light;
 
-  // Toggle theme
   void switchTheme() {
     saveTheme(!isDarkMode());
     Get.changeThemeMode(isDarkMode() ? ThemeMode.dark : ThemeMode.light);

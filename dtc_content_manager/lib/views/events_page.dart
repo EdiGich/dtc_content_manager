@@ -1,4 +1,3 @@
-// events_page.dart
 import 'package:flutter/material.dart';
 import 'package:dtc_content_manager/services/news_events_service.dart';
 import 'package:dtc_content_manager/views/add_event_page.dart';
@@ -29,13 +28,50 @@ class _EventsPageState extends State<EventsPage> {
       await _service.deleteEvent(eventId);
       _refreshEvents();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Event deleted successfully')),
+        SnackBar(
+          content: const Text('Event deleted successfully'),
+          backgroundColor: Colors.teal,
+          behavior: SnackBarBehavior.floating,
+        ),
       );
     } catch (e) {
+      print('Error deleting event: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to delete event')),
       );
     }
+  }
+
+  void _showDeleteConfirmationDialog(int eventId, String title) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          title: Text(
+            'Confirm Deletion',
+            style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            'Are you sure you want to delete "$title"? This action cannot be undone.',
+            style: const TextStyle(fontSize: 16),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Cancel', style: TextStyle(color: Theme.of(context).hintColor)),
+            ),
+            TextButton(
+              onPressed: () {
+                _deleteEvent(eventId);
+                Navigator.of(context).pop();
+              },
+              child: const Text('Delete', style: TextStyle(color: Colors.redAccent)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -54,48 +90,100 @@ class _EventsPageState extends State<EventsPage> {
                 ),
               );
             },
+            tooltip: 'Add Event',
           ),
         ],
       ),
-      body: FutureBuilder<List<dynamic>>(
-        future: _eventsList,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return const Center(child: Text('Failed to load events'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No events available'));
-          } else {
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                final event = snapshot.data![index];
-                return Card(
-                  margin: const EdgeInsets.all(8.0),
-                  child: ListTile(
-                    title: Text(event['title'] ?? 'Untitled Event'),
-                    subtitle: Text(
-                      '${event['date'] ?? 'N/A'} at ${event['time'] ?? 'N/A'}',
+      body: Container(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
+        child: FutureBuilder<List<dynamic>>(
+          future: _eventsList,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.teal),
+                ),
+              );
+            } else if (snapshot.hasError) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.error_outline, size: 50, color: Colors.redAccent),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Failed to load events',
+                      style: TextStyle(fontSize: 16),
                     ),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () => _deleteEvent(event['id']),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: _refreshEvents,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.teal,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: const Text('Retry'),
                     ),
-                    leading: event['image'] != null
-                        ? Image.network(
-                      event['image'],
-                      width: 50,
-                      height: 50,
-                      fit: BoxFit.cover,
-                    )
-                        : const Icon(Icons.event),
-                  ),
-                );
-              },
-            );
-          }
-        },
+                  ],
+                ),
+              );
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Center(
+                child: Text(
+                  'No events available',
+                  style: TextStyle(fontSize: 16),
+                ),
+              );
+            } else {
+              return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  final event = snapshot.data![index];
+                  return Card(
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: Colors.teal.withOpacity(0.2), width: 1),
+                    ),
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    child: ListTile(
+                      leading: event['image'] != null
+                          ? ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          event['image'],
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) =>
+                          const Icon(Icons.broken_image, size: 50),
+                        ),
+                      )
+                          : const Icon(Icons.event, size: 50, color: Colors.teal),
+                      title: Text(
+                        event['title'] ?? 'Untitled Event',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(
+                        '${event['date'] ?? 'N/A'} at ${event['time'] ?? 'N/A'}',
+                      ),
+                      trailing: IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.redAccent),
+                        onPressed: () => _showDeleteConfirmationDialog(
+                          event['id'],
+                          event['title'] ?? 'Untitled Event',
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              );
+            }
+          },
+        ),
       ),
     );
   }
