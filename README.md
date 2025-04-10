@@ -57,7 +57,8 @@ flutter run
 ```
 
 ### Author
-Built with ❤️ by [Edwin Gichira]
+Built with ❤️ by [Edwin Gichira](https://www.linkedin.com/in/edwin-gichira-9147a8213/)
+
 
 Flutter Developer | UI/UX Enthusiast | Passionate about building real-world solutions.
 
