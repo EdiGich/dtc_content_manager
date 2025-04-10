@@ -19,7 +19,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
   void _initializeWebSocket() {
     _webSocketService = WebSocketService(
-      serverUrl: 'wss://codenaican.pythonanywhere.com/ws/notifications/',
+      serverUrl: 'wss://delicioustumainicaterers.pythonanywhere.com/ws/notifications/',
     );
 
     _webSocketService.connect();

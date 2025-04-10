@@ -139,7 +139,7 @@ class _ConnectivityWrapperState extends State<ConnectivityWrapper> {
 
     // Initialize WebSocket Service
     _webSocketService = WebSocketService(
-      serverUrl: 'wss://codenaican.pythonanywhere.com/ws/notifications/',
+      serverUrl: 'wss://delicioustumainicaterers.pythonanywhere.com/ws/notifications/',
     );
     _webSocketService.connect();
 

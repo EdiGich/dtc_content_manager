@@ -18,7 +18,7 @@ class _MessagesPageState extends State<MessagesPage> {
   String filter = 'All';
   String searchQuery = '';
 
-  final String messagesApiUrl = 'https://codenaican.pythonanywhere.com/api/messages/';
+  final String messagesApiUrl = 'https://delicioustumainicaterers.pythonanywhere.com/api/messages/';
   final TextEditingController _searchController = TextEditingController();
 
   @override

@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:get_storage/get_storage.dart';
 import 'package:dtc_content_manager/models/menu_item_model.dart';
+import 'package:dtc_content_manager/views/add_menu_item_page.dart'; // New import
 
 class MenuUpdatePage extends StatefulWidget {
   @override
@@ -14,7 +15,7 @@ class _MenuUpdatePageState extends State<MenuUpdatePage> {
   bool isLoading = true;
   bool hasError = false;
 
-  final String menuApiUrl = 'https://codenaican.pythonanywhere.com/api/menu/';
+  final String menuApiUrl = 'https://delicioustumainicaterers.pythonanywhere.com/api/menu/';
 
   @override
   void initState() {
@@ -169,7 +170,7 @@ class _MenuUpdatePageState extends State<MenuUpdatePage> {
                   decoration: InputDecoration(
                     labelText: 'Price',
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                    prefixText: '\$ ',
+                    prefixText: 'Ksh ',
                   ),
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                 ),
@@ -248,6 +249,18 @@ class _MenuUpdatePageState extends State<MenuUpdatePage> {
             icon: const Icon(Icons.refresh),
             onPressed: fetchMenuItems,
             tooltip: 'Refresh Menu',
+          ),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AddMenuItemPage(refreshMenuItems: fetchMenuItems),
+                ),
+              );
+            },
+            tooltip: 'Add Menu Item',
           ),
         ],
       ),

@@ -58,7 +58,8 @@ class AuthService {
 
   final String baseUrl =
       // 'http://10.0.2.2:8000/api/token/';
-      'https://codenaican.pythonanywhere.com/api/token/';
+      'https://delicioustumainicaterers.pythonanywhere.com/api/token/';
+
 
   Future<Map<String, dynamic>> login(String username, String password) async {
     final response = await http.post(

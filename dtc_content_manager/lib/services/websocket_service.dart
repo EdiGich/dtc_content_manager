@@ -14,7 +14,7 @@ class WebSocketService {
   /// Connect to the WebSocket server
   void connect() {
     _channel = WebSocketChannel.connect(Uri.parse(serverUrl));
-    print('Connected to WebSocket: $serverUrl');
+    // print('Connected to WebSocket: $serverUrl');
 
     /// Listen to incoming messages
     _channel.stream.listen(
@@ -25,13 +25,13 @@ class WebSocketService {
         // Show a local notification
         _showNotification("New Notification", message);
 
-        print('Received: $message');
+        // print('Received: $message');
       },
       onError: (error) {
-        print('WebSocket Error: $error');
+        // print('WebSocket Error: $error');
       },
       onDone: () {
-        print('WebSocket connection closed.');
+        // print('WebSocket connection closed.');
       },
     );
   }
@@ -43,14 +43,14 @@ class WebSocketService {
   void sendMessage(Map<String, dynamic> message) {
     final encodedMessage = json.encode(message);
     _channel.sink.add(encodedMessage);
-    print('Sent: $encodedMessage');
+    // print('Sent: $encodedMessage');
   }
 
   /// Close the connection
   void disconnect() {
     _channel.sink.close();
     _messageController.close();
-    print('Disconnected from WebSocket');
+    // print('Disconnected from WebSocket');
   }
 
   /// Show a local notification

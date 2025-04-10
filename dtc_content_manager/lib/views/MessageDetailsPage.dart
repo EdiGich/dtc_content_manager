@@ -11,7 +11,7 @@ class MessageDetailsPage extends StatelessWidget {
   const MessageDetailsPage({required this.message, this.onStatusUpdated});
 
   void updateMessageStatus(BuildContext context, int messageId, int newStatus) async {
-    final String updateUrl = 'https://codenaican.pythonanywhere.com/api/messages/$messageId/';
+    final String updateUrl = 'https://delicioustumainicaterers.pythonanywhere.com/api/messages/$messageId/';
 
     final token = GetStorage().read('authToken');
     if (token == null) {

@@ -20,7 +20,7 @@ class _GalleryUploadPageState extends State<GalleryUploadPage> {
   final TextEditingController _descriptionController = TextEditingController();
   bool _isLoading = false;
 
-  final String uploadUrl = 'https://codenaican.pythonanywhere.com/api/galleryitem/upload/';
+  final String uploadUrl = 'https://delicioustumainicaterers.pythonanywhere.com/api/galleryitem/upload/';
   final storage = GetStorage();
 
   Future<void> _pickImage() async {

@@ -40,7 +40,7 @@ class _AdminGalleryManagementPageState extends State<AdminGalleryManagementPage>
       }
 
       final response = await http.get(
-        Uri.parse('https://codenaican.pythonanywhere.com/api/galleryitem/manage/'),
+        Uri.parse('https://delicioustumainicaterers.pythonanywhere.com/api/galleryitem/manage/'),
         headers: {'Authorization': 'Bearer $token'},
       );
 
@@ -73,7 +73,7 @@ class _AdminGalleryManagementPageState extends State<AdminGalleryManagementPage>
     }
 
     final response = await http.delete(
-      Uri.parse('https://codenaican.pythonanywhere.com/api/galleryitem/manage/$id/'),
+      Uri.parse('https://delicioustumainicaterers.pythonanywhere.com/api/galleryitem/manage/$id/'),
       headers: {'Authorization': 'Bearer ${storage.read('authToken')}'},
     );
 
@@ -92,7 +92,7 @@ class _AdminGalleryManagementPageState extends State<AdminGalleryManagementPage>
     String? token = storage.read('authToken');
 
     final response = await http.put(
-      Uri.parse('https://codenaican.pythonanywhere.com/api/galleryitem/manage/$id/'),
+      Uri.parse('https://delicioustumainicaterers.pythonanywhere.com/api/galleryitem/manage/$id/'),
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer $token',
@@ -202,7 +202,7 @@ class _AdminGalleryManagementPageState extends State<AdminGalleryManagementPage>
                 leading: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
                   child: Image.network(
-                    'https://codenaican.pythonanywhere.com${item['image']}',
+                    'https://delicioustumainicaterers.pythonanywhere.com${item['image']}',
                     width: 50,
                     height: 50,
                     fit: BoxFit.cover,
