@@ -61,5 +61,5 @@ Built with ❤️ by [Edwin Gichira]
 
 Flutter Developer | UI/UX Enthusiast | Passionate about building real-world solutions.
 
-License
+### License
 This project is for educational and portfolio purposes.
